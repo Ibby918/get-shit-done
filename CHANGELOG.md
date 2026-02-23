@@ -6,6 +6,54 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- Native Codex runtime support in installer via `--codex` and `--all` (Codex included), with config resolution precedence: `--config-dir` → `CODEX_HOME` → `~/.codex`
+- Skills-first Codex installation path that transpiles GSD commands to `skills/gsd-*/SKILL.md` (no custom-prompt dependency)
+- Codex-specific install/uninstall + manifest support for skill layout tracking and cleanup
+
+### Changed
+- Codex-installed content rewrites slash-command references to skill mentions (`/gsd:*` → `$gsd-*`) and normalizes command arguments (`$ARGUMENTS` → `{{GSD_ARGS}}`)
+- README/package metadata updated to document Codex install, invocation (`$gsd-help`), and uninstall flow
+- `/gsd:debug` flow now requires a `human-verify` checkpoint after self-verification before marking debug sessions `resolved` and moving files to `.planning/debug/resolved/`
+
+### Fixed
+- `gsd-tools phase complete` handles multi-level decimal phases (e.g. `03.2.1`) and safely escapes requirement IDs when building regex patterns, preventing `Invalid regular expression` crashes
+- `gsd-tools state-snapshot` supports `--cwd <path>` so tooling can target a project directory when invoked from outside the repo
+- `/gsd:update` now installs with `npx get-shit-done-cc@latest` (instead of unpinned `npx get-shit-done-cc`) to prevent stale project-local versions from shadowing updates
+- `/gsd:update` now uses strict package safety checks: only `get-shit-done-cc` is allowed, scoped/user-derived package names are rejected, and install command execution is allowlisted to trusted forms
+- `/gsd:update` install detection now validates local integrity and falls back to global install when local metadata is missing or invalid
+
+## [1.20.6] - 2025-02-23
+
+### Added
+- Context window monitor hook with WARNING/CRITICAL alerts when agent context usage exceeds thresholds
+- Nyquist validation layer in plan-phase pipeline to catch quality issues before execution
+- Option highlighting and gray area looping in discuss-phase for clearer preference capture
+
+### Changed
+- Refactored installer tools into 11 domain modules for maintainability
+
+### Fixed
+- Auto-advance chain no longer breaks when skills fail to resolve inside Task subagents
+- Gemini CLI workflows and templates no longer incorrectly convert to TOML format
+- Universal phase number parsing handles all formats consistently (decimal phases, plain numbers)
+
+## [1.20.5] - 2026-02-19
+
+### Fixed
+- `/gsd:health --repair` now creates timestamped backup before regenerating STATE.md (#657)
+
+### Changed
+- Subagents now discover and load project CLAUDE.md and skills at spawn time for better project context (#671, #672)
+- Improved context loading reliability in spawned agents
+
+## [1.20.4] - 2026-02-17
+
+### Fixed
+- Executor agents now update ROADMAP.md and REQUIREMENTS.md after each plan completes — previously both documents stayed unchecked throughout milestone execution
+- New `requirements mark-complete` CLI command enables per-plan requirement tracking instead of waiting for phase completion
+- Executor final commit includes ROADMAP.md and REQUIREMENTS.md
+
 ## [1.20.3] - 2026-02-16
 
 ### Fixed
@@ -1303,7 +1351,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - YOLO mode for autonomous execution
 - Interactive mode with checkpoints
 
-[Unreleased]: https://github.com/glittercowboy/get-shit-done/compare/v1.20.3...HEAD
+[Unreleased]: https://github.com/glittercowboy/get-shit-done/compare/v1.20.6...HEAD
+[1.20.6]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.20.6
+[1.20.5]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.20.5
+[1.20.4]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.20.4
 [1.20.3]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.20.3
 [1.20.2]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.20.2
 [1.20.1]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.20.1
