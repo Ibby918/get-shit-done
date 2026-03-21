@@ -1,90 +1,105 @@
 ---
 name: get-shit-done
 description: >
-  Use this skill whenever the user wants to build, plan, or systematically develop a software
-  project using Claude Code. Trigger when the user says things like "let's build X", "help me
-  start a new project", "plan out this feature", "I want to build a SaaS app", "let's add a
-  new phase", "what should I work on next", or "help me structure this project". Also trigger
-  when the user wants parallel agent execution, spec-driven development, or structured git
-  history per task. Trigger for "map my codebase" or "analyse this repo" before planning work.
-  Skip for simple one-off code edits that don't need planning. Skip for general coding questions
-  or explanations where no project is being built. Skip when the user wants a quick fix rather
-  than a structured development workflow — use /gsd:quick for those instead.
+  Use when the user wants to build, plan, or systematically develop a software project.
+  Trigger phrases: "let's build X", "help me start a new project", "plan out this feature",
+  "I want to build a SaaS app", "add a new phase to my project", "what should I work on
+  next", "help me structure this codebase", "map my codebase before we start".
+  Also trigger when the user wants atomic git commits per task, parallel agent execution,
+  or phased spec-driven development with verification.
+  Do NOT trigger for: simple one-off edits, answering a coding question, quick bug fixes
+  where no planning is needed. For quick ad-hoc tasks without full planning, use
+  `/gsd:quick` instead of `/gsd:new-project`.
 ---
 
-# Get Shit Done (GSD) — Spec-Driven Development for Claude Code
+# Get Shit Done (GSD) — Spec-Driven Development
 
-A meta-prompting, context engineering and spec-driven development system. Eliminates context rot
-by running each execution task in a fresh 200k context window via parallel subagents.
-Trusted by engineers at Amazon, Google, Shopify and Webflow.
+Eliminates context rot by running each execution task in a fresh 200k context window.
+Each task gets one atomic git commit. Parallel agents for independent work.
 
 ## Core Workflow
 
-```
-/gsd:new-project      Full init: questions → research → requirements → roadmap
-/gsd:discuss-phase 1  Capture your implementation decisions before planning
-/gsd:plan-phase 1     Research the domain + create atomic XML task plans
-/gsd:execute-phase 1  Execute plans in parallel waves, auto-verify on completion
-/gsd:verify-work 1    Walk through user acceptance testing step by step
-/gsd:ship 1           Create a PR with auto-generated description
-/gsd:next             Auto-detect and run the next logical workflow step
-```
-
-## Quick Mode (for ad-hoc tasks)
+Always follow this order. Don't skip phases.
 
 ```
-/gsd:quick                      Fast task with GSD guarantees (commits + state)
+Step 1  /gsd:new-project        Questions → research → requirements → roadmap
+Step 2  /gsd:discuss-phase N    Lock decisions before any planning
+Step 3  /gsd:plan-phase N       Research domain + create verified XML task plans
+Step 4  /gsd:execute-phase N    Build in parallel waves, auto-verify on completion
+Step 5  /gsd:verify-work N      Walk through UAT, auto-diagnose any failures
+Step 6  /gsd:ship N             Create PR with auto-generated description
+        /gsd:next               Auto-detect and run the next step (shortcut)
+```
+
+**For existing codebases**, run `/gsd:map-codebase` before `/gsd:new-project`.
+
+## Quick Mode (Ad-hoc tasks)
+
+When user wants one thing done fast without full project planning:
+```
+/gsd:quick                      Run a task with GSD guarantees
 /gsd:quick --discuss            Gather context before planning
-/gsd:quick --research           Research approaches before planning
-/gsd:quick --full               Full plan-check + verification
+/gsd:quick --research           Research before planning
+/gsd:quick --full               Adds plan verification + post-execution check
 ```
 
 ## All Commands
 
-| Command | What it does |
+| Command | When to use |
 |---|---|
-| `/gsd:new-project` | Start fresh: questions → research → requirements → roadmap |
-| `/gsd:map-codebase` | Analyse existing repo before new-project (brownfield) |
-| `/gsd:discuss-phase N` | Lock down your decisions before planning phase N |
-| `/gsd:plan-phase N` | Research + create verified atomic task plans for phase N |
-| `/gsd:execute-phase N` | Build phase N using parallel agent waves |
-| `/gsd:verify-work N` | UAT: test each deliverable, auto-diagnose failures |
-| `/gsd:ship N` | Create PR from verified phase work |
-| `/gsd:next` | Auto-advance to next step |
+| `/gsd:new-project` | New project, blank directory |
+| `/gsd:map-codebase [area]` | Existing repo — analyse before planning |
+| `/gsd:discuss-phase N` | Before plan-phase — lock your decisions |
+| `/gsd:plan-phase N` | After discuss — creates verified task plans |
+| `/gsd:execute-phase N` | Run plans in parallel waves |
+| `/gsd:verify-work N` | UAT: test deliverables, diagnose failures |
+| `/gsd:ship N` | Create PR from verified work |
+| `/gsd:next` | Auto-advance to next logical step |
 | `/gsd:progress` | Where am I? What's next? |
-| `/gsd:debug` | Systematic debugging with persistent state |
-| `/gsd:add-phase` | Append a phase to the roadmap |
-| `/gsd:insert-phase N` | Insert urgent work between phases |
-| `/gsd:pause-work` | Create handoff for stopping mid-phase |
+| `/gsd:debug [desc]` | Systematic debugging with state |
+| `/gsd:add-phase` | Append a phase to roadmap |
+| `/gsd:insert-phase N` | Insert work between phases |
+| `/gsd:pause-work` | Create handoff when stopping |
 | `/gsd:resume-work` | Restore from last session |
-| `/gsd:session-report` | Summary of what was done this session |
-| `/gsd:stats` | Project statistics: phases, plans, git metrics |
-| `/gsd:update` | Update GSD to latest version |
+| `/gsd:session-report` | Summary of this session |
+| `/gsd:stats` | Project metrics: phases, tokens, git |
+| `/gsd:update` | Update GSD to latest |
 | `/gsd:help` | Full command reference |
 
 ## Model Profiles
 
+Switch based on budget vs quality tradeoff:
 ```
-/gsd:set-profile quality    Opus planning + Opus execution (best quality)
-/gsd:set-profile balanced   Opus planning + Sonnet execution (default)
-/gsd:set-profile budget     Sonnet throughout (token-efficient)
-/gsd:set-profile inherit    Follow current runtime model selection
+/gsd:set-profile quality     Opus planning + Opus execution (best output)
+/gsd:set-profile balanced    Opus planning + Sonnet execution (default)
+/gsd:set-profile budget      Sonnet throughout
+/gsd:set-profile inherit     Use whatever model is currently active
 ```
 
-## Why It Works
+## How It Works (Key Points for Claude)
 
-- **Fresh context per task** — 200k tokens purely for execution, zero accumulated noise
-- **XML-structured plans** — precise instructions with built-in verification steps
-- **Parallel wave execution** — independent tasks run simultaneously
-- **Atomic git commits** — one commit per task, clean bisectable history
-- **Automated verification** — checks delivered code against goals after each phase
-- **State persistence** — `STATE.md` keeps decisions and blockers across sessions
+- **Each task gets a fresh 200k context** — subagents don't inherit session history
+- **Plans are XML-structured** with explicit `<action>`, `<verify>`, `<done>` tags
+- **Wave execution** — independent plans run in parallel, dependent ones sequential
+- **Every task commits** — one atomic commit per task for clean git bisect history
+- **STATE.md persists decisions** — Claude reads this at session start to restore context
 
-## First Time Setup
+## Common Mistakes
 
-Open a blank project directory in Claude Code and run:
+- **Don't skip discuss-phase** — it's where your vision gets locked in before the planner runs
+- **Don't use new-project on existing codebases** without running map-codebase first
+- **Don't run execute-phase without plan-phase** — no plans = nothing to execute
+- **If execution fails**, don't re-run manually — use `/gsd:verify-work` to auto-diagnose and generate fix plans
+
+## Files GSD Creates
+
 ```
-/gsd:new-project
+PROJECT.md          Vision and goals — always loaded
+REQUIREMENTS.md     Scoped v1/v2 with phase traceability
+ROADMAP.md          Phases and progress
+STATE.md            Decisions, blockers, current position
+N-CONTEXT.md        Your decisions for phase N (from discuss)
+N-RESEARCH.md       Domain research for phase N
+N-M-PLAN.md         Atomic task plan for task M in phase N
+N-M-SUMMARY.md      What was built and committed
 ```
-GSD will ask questions, research your domain, extract requirements, and create a roadmap.
-You approve the roadmap — then it builds.
