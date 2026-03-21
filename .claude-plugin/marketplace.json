@@ -4,13 +4,13 @@
     "name": "gsd-build"
   },
   "metadata": {
-    "description": "Spec-driven development system for Claude Code. Plan, execute and verify projects in phases using parallel subagents."
+    "description": "Spec-driven development system for Claude Code. Plan, execute and verify projects in phases."
   },
   "plugins": [
     {
       "name": "get-shit-done",
       "source": "./get-shit-done-plugin",
-      "description": "Spec-driven development system for Claude Code. Plan, execute and verify projects in phases using parallel subagents.",
+      "description": "Spec-driven development system for Claude Code. Plan, execute and verify projects in phases.",
       "author": {
         "name": "gsd-build"
       },
