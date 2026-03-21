@@ -37,3 +37,7 @@ philosophy.md
 .github/skills/get-shit-done
 .github/copilot-instructions.md
 .bg-shell/
+
+# Dolt database files (added by bd init)
+.dolt/
+*.db
