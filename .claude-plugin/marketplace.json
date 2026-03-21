@@ -1,0 +1,14 @@
+{
+    "description":  "Spec-driven development system for Claude Code. Plan, execute and verify projects in phases.",
+    "name":  "get-shit-done",
+    "display_name":  "Get Shit Done",
+    "plugins":  [
+                    {
+                        "path":  ".",
+                        "description":  "Spec-driven development system for Claude Code. Plan, execute and verify projects in phases.",
+                        "name":  "get-shit-done",
+                        "display_name":  "Get Shit Done"
+                    }
+                ],
+    "version":  "1.0.0"
+}
