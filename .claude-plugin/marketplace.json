@@ -1,0 +1,22 @@
+﻿{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "get-shit-done",
+  "owner": {
+    "name": "gsd-build"
+  },
+  "metadata": {
+    "description": "Spec-driven development system for Claude Code. Plan, execute and verify projects in phases using parallel subagents."
+  },
+  "plugins": [
+    {
+      "name": "get-shit-done",
+      "source": "./get-shit-done-plugin",
+      "description": "Spec-driven development system for Claude Code. Plan, execute and verify projects in phases using parallel subagents.",
+      "author": {
+        "name": "gsd-build"
+      },
+      "category": "development",
+      "homepage": "https://github.com/Ibby918/get-shit-done"
+    }
+  ]
+}
