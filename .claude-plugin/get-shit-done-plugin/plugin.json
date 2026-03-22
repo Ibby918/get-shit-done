@@ -1,7 +1,0 @@
-{
-  "name": "get-shit-done",
-  "description": "Spec-driven development system for Claude Code. Plan, execute and verify projects in phases using parallel subagents.",
-  "author": {
-    "name": "gsd-build"
-  }
-}
